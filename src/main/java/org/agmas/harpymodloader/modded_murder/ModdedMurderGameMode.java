@@ -73,20 +73,24 @@ public class ModdedMurderGameMode extends MurderGameMode {
         });
 
         Collections.shuffle(shuffledCivillianRoles);
+        Collections.shuffle(shuffledNeutralRoles);
 
         int neutralDesiredRoleCount = (int)Math.floor(((float)players.size() / 6F));
+        int assignedNeutralRoles = 0;
         int neutralRoleCount = 0;
 
-        for (Role role : shuffledCivillianRoles) {
+        for (Role role : shuffledNeutralRoles) {
             if (HarpyModLoaderConfig.HANDLER.instance().disabled.contains(role.identifier().getPath())) continue;
             neutralRoleCount++;
         }
+
         for (Role role : shuffledNeutralRoles) {
             if (HarpyModLoaderConfig.HANDLER.instance().disabled.contains(role.identifier().getPath())) continue;
-            int roleSpecificDesireCount = Math.min((int) Math.ceil((double) playersForCivillianRoles.size() / neutralRoleCount), neutralDesiredRoleCount);
+            if (assignedNeutralRoles >= neutralDesiredRoleCount) continue;
+            int roleSpecificDesireCount = Math.min((int) Math.ceil((double) playersForCivillianRoles.size() / neutralRoleCount), desiredRoleCount);
             if (Harpymodloader.ROLE_MAX.containsKey(role.identifier())) roleSpecificDesireCount = Harpymodloader.ROLE_MAX.get(role.identifier());
 
-            findAndAssignPlayers(roleSpecificDesireCount, role, playersForCivillianRoles,gameWorldComponent,serverWorld);
+            assignedNeutralRoles += findAndAssignPlayers(roleSpecificDesireCount, role, playersForCivillianRoles,gameWorldComponent,serverWorld);
         }
 
         playersForCivillianRoles.removeIf(player -> {
@@ -102,7 +106,7 @@ public class ModdedMurderGameMode extends MurderGameMode {
 
         for (Role role : shuffledCivillianRoles) {
             if (HarpyModLoaderConfig.HANDLER.instance().disabled.contains(role.identifier().getPath())) continue;
-            int roleSpecificDesireCount = Math.min((int) Math.ceil((double) playersForCivillianRoles.size() / roleCount), desiredRoleCount);
+            int roleSpecificDesireCount = Math.min((int) Math.max(Math.round((double) playersForCivillianRoles.size() / roleCount),1), desiredRoleCount);
             if (Harpymodloader.ROLE_MAX.containsKey(role.identifier())) roleSpecificDesireCount = Harpymodloader.ROLE_MAX.get(role.identifier());
 
             findAndAssignPlayers(roleSpecificDesireCount, role, playersForCivillianRoles,gameWorldComponent,serverWorld);
@@ -135,7 +139,7 @@ public class ModdedMurderGameMode extends MurderGameMode {
         }
     }
 
-    private static void findAndAssignPlayers(int desiredRoleCount, Role role, @NotNull List<ServerPlayerEntity> players, GameWorldComponent gameWorldComponent, World world) {
+    private static int findAndAssignPlayers(int desiredRoleCount, Role role, @NotNull List<ServerPlayerEntity> players, GameWorldComponent gameWorldComponent, World world) {
 
         ArrayList<ServerPlayerEntity> assignedPlayers = new ArrayList<>();
 
@@ -145,6 +149,7 @@ public class ModdedMurderGameMode extends MurderGameMode {
                 if (player instanceof ServerPlayerEntity serverPlayer) {
                     if (players.contains(serverPlayer)) {
                         assignedPlayers.add(serverPlayer);
+                        gameWorldComponent.addRole(player,role);
                         --desiredRoleCount;
                         ModdedWeights.roleRounds.get(role).put(player.getUuid(), ModdedWeights.roleRounds.get(role).getOrDefault(player.getUuid(), 1) + 1);
                     }
@@ -184,10 +189,13 @@ public class ModdedMurderGameMode extends MurderGameMode {
             }
         }
 
+        int i = 0;
         for(ServerPlayerEntity player : assignedPlayers) {
             gameWorldComponent.addRole(player,role);
             ModdedRoleAssigned.EVENT.invoker().assignModdedRole(player,role);
+            i++;
         }
+        return i;
     }
 
     public int assignVannilaRoles(ServerWorld serverWorld, GameWorldComponent gameWorldComponent, List<ServerPlayerEntity> players) {
