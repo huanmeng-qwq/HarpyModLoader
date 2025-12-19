@@ -5,8 +5,8 @@ import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
-import dev.doctor4t.trainmurdermystery.api.Role;
-import dev.doctor4t.trainmurdermystery.api.TMMRoles;
+import dev.doctor4t.wathe.api.Role;
+import dev.doctor4t.wathe.api.WatheRoles;
 import net.fabricmc.loader.impl.util.log.Log;
 import net.fabricmc.loader.impl.util.log.LogCategory;
 import net.minecraft.server.command.CommandManager;
@@ -29,7 +29,7 @@ public class SetEnabledRoleCommand {
     }
     private static int execute(ServerCommandSource source, String roleName, boolean enabled) throws CommandSyntaxException {
         HarpyModLoaderConfig.HANDLER.save();
-        for (Role role : TMMRoles.ROLES) {
+        for (Role role : WatheRoles.ROLES) {
             if (role.identifier().getPath().equals(roleName)) {
                 boolean disabled = HarpyModLoaderConfig.HANDLER.instance().disabled.contains(roleName);
                 Text roleText = Text.literal(roleName).withColor(role.color());

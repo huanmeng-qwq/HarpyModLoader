@@ -1,31 +1,37 @@
 package org.agmas.harpymodloader;
 
-import dev.doctor4t.trainmurdermystery.api.GameMode;
-import dev.doctor4t.trainmurdermystery.api.Role;
-import dev.doctor4t.trainmurdermystery.api.TMMGameModes;
-import dev.doctor4t.trainmurdermystery.api.TMMRoles;
-import dev.doctor4t.trainmurdermystery.client.gui.RoleAnnouncementTexts;
+import dev.doctor4t.wathe.api.GameMode;
+import dev.doctor4t.wathe.api.Role;
+import dev.doctor4t.wathe.api.WatheGameModes;
+import dev.doctor4t.wathe.api.WatheRoles;
+import dev.doctor4t.wathe.client.gui.RoleAnnouncementTexts;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.loader.impl.util.log.Log;
 import net.fabricmc.loader.impl.util.log.LogCategory;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
+import org.agmas.harpymodloader.commands.ForceModifierCommand;
 import org.agmas.harpymodloader.commands.ForceRoleCommand;
 import org.agmas.harpymodloader.commands.ListRolesCommand;
 import org.agmas.harpymodloader.commands.SetEnabledRoleCommand;
 import org.agmas.harpymodloader.config.HarpyModLoaderConfig;
 import org.agmas.harpymodloader.modded_murder.ModdedMurderGameMode;
 import org.agmas.harpymodloader.modded_murder.ModdedWeights;
+import org.agmas.harpymodloader.modifiers.HMLModifiers;
+import org.agmas.harpymodloader.modifiers.Modifier;
 
 import java.util.*;
 
 public class Harpymodloader implements ModInitializer {
 
     public static HashMap<Identifier, Integer> ROLE_MAX = new HashMap<>();
+    public static HashMap<Identifier, Integer> MODIFIER_MAX = new HashMap<>();
 
     public static HashMap<Role, List<UUID>> FORCED_MODDED_ROLE = new HashMap<>();
     public static HashMap<UUID, Role> FORCED_MODDED_ROLE_FLIP = new HashMap<>();
+
+    public static HashMap<Modifier, List<UUID>> FORCED_MODDED_MODIFIER = new HashMap<>();
 
     public static ArrayList<Role> VANNILA_ROLES = new ArrayList<>();
     public static ArrayList<Role> SPECIAL_ROLES = new ArrayList<>();
@@ -41,24 +47,26 @@ public class Harpymodloader implements ModInitializer {
     @Override
     public void onInitialize() {
         HarpyModLoaderConfig.HANDLER.load();
-        VANNILA_ROLES.add(TMMRoles.LOOSE_END);
-        VANNILA_ROLES.add(TMMRoles.CIVILIAN);
-        VANNILA_ROLES.add(TMMRoles.KILLER);
-        VANNILA_ROLES.add(TMMRoles.VIGILANTE);
-        VANNILA_ROLES.add(TMMRoles.DISCOVERY_CIVILIAN);
+        VANNILA_ROLES.add(WatheRoles.LOOSE_END);
+        VANNILA_ROLES.add(WatheRoles.CIVILIAN);
+        VANNILA_ROLES.add(WatheRoles.KILLER);
+        VANNILA_ROLES.add(WatheRoles.VIGILANTE);
+        VANNILA_ROLES.add(WatheRoles.DISCOVERY_CIVILIAN);
 
-        SPECIAL_ROLES.add(TMMRoles.LOOSE_END);
-        SPECIAL_ROLES.add(TMMRoles.DISCOVERY_CIVILIAN);
-        SPECIAL_ROLES.add(TMMRoles.CIVILIAN); // civilian is considered special since it can't be assigned, just given out to everyone
+        SPECIAL_ROLES.add(WatheRoles.LOOSE_END);
+        SPECIAL_ROLES.add(WatheRoles.DISCOVERY_CIVILIAN);
+        SPECIAL_ROLES.add(WatheRoles.CIVILIAN); // civilian is considered special since it can't be assigned, just given out to everyone
 
-        OVERWRITE_ROLES.add(TMMRoles.CIVILIAN);
-        OVERWRITE_ROLES.add(TMMRoles.KILLER);
+        OVERWRITE_ROLES.add(WatheRoles.CIVILIAN);
+        OVERWRITE_ROLES.add(WatheRoles.KILLER);
 
         ModdedWeights.init();
 
         registerCommands();
+        HMLModifiers.init();
 
-        MODDED_GAMEMODE = TMMGameModes.registerGameMode(Identifier.of(MOD_ID, "modded"), new ModdedMurderGameMode(Identifier.of(MOD_ID, "modded")));
+        MODDED_GAMEMODE = WatheGameModes.registerGameMode(Identifier.of(MOD_ID, "modded"), new ModdedMurderGameMode(Identifier.of(MOD_ID, "modded")));
+
         refreshRoles();
     }
 
@@ -66,7 +74,7 @@ public class Harpymodloader implements ModInitializer {
     // re-indexes roles
     //
     public static void refreshRoles() {
-        for (Role role : TMMRoles.ROLES) {
+        for (Role role : WatheRoles.ROLES) {
             if (SPECIAL_ROLES.contains(role)) continue;
             if (!ModdedWeights.roleRounds.containsKey(role)) {
                 ModdedWeights.roleRounds.put(role, new HashMap<>());
@@ -80,6 +88,11 @@ public class Harpymodloader implements ModInitializer {
         }
     }
 
+    public static void addToForcedModifiers(Modifier modifier, PlayerEntity player) {
+        if (!FORCED_MODDED_MODIFIER.containsKey(modifier)) FORCED_MODDED_MODIFIER.put(modifier, new ArrayList<>());
+        FORCED_MODDED_MODIFIER.get(modifier).add(player.getUuid());
+
+    }
     public static void addToForcedRoles(Role role, PlayerEntity player) {
         if (!FORCED_MODDED_ROLE.containsKey(role)) FORCED_MODDED_ROLE.put(role, new ArrayList<>());
         FORCED_MODDED_ROLE.get(role).add(player.getUuid());
@@ -98,6 +111,7 @@ public class Harpymodloader implements ModInitializer {
             ForceRoleCommand.register(dispatcher);
             SetEnabledRoleCommand.register(dispatcher);
             ListRolesCommand.register(dispatcher);
+            ForceModifierCommand.register(dispatcher);
         });
     }
 

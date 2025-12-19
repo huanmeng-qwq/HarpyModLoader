@@ -12,35 +12,28 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import org.agmas.harpymodloader.Harpymodloader;
+import org.agmas.harpymodloader.commands.suggestions.ModifierSuggestionProvider;
 import org.agmas.harpymodloader.commands.suggestions.RoleSuggestionProvider;
+import org.agmas.harpymodloader.modifiers.HMLModifiers;
+import org.agmas.harpymodloader.modifiers.Modifier;
 
-public class ForceRoleCommand {
+public class ForceModifierCommand {
     public static final SimpleCommandExceptionType INVALID_ROLE_EXCEPTION = new SimpleCommandExceptionType(Text.translatable("commands.forcerole.invalid"));
 
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
-        dispatcher.register(CommandManager.literal("forceRole")
+        dispatcher.register(CommandManager.literal("forceModifier")
                 .requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(2))
                 .then(CommandManager.argument("player", EntityArgumentType.player())
-                        .executes(context -> query(context.getSource(), EntityArgumentType.getPlayer(context, "player")))
                 .then(CommandManager.argument("role", StringArgumentType.string())
-                        .suggests(new RoleSuggestionProvider())
+                        .suggests(new ModifierSuggestionProvider())
                         .executes(context -> execute(context.getSource(), EntityArgumentType.getPlayer(context,"player"), StringArgumentType.getString(context,"role"))))));
     }
-    private static int query(ServerCommandSource source, ServerPlayerEntity targetPlayer) {
-        if (!Harpymodloader.FORCED_MODDED_ROLE_FLIP.containsKey(targetPlayer.getUuid())) {
-            source.sendFeedback(() -> Text.translatable("commands.forcerole.query.none", targetPlayer.getDisplayName()), false);
-            return 1;
-        }
-        Role role = Harpymodloader.FORCED_MODDED_ROLE_FLIP.get(targetPlayer.getUuid());
-        Text roleText = Text.literal(role.identifier().getPath()).withColor(role.color());
-        source.sendFeedback(() -> Text.translatable("commands.forcerole.query", targetPlayer.getDisplayName(), roleText), false);
-        return 1;
-    }
+
     private static int execute(ServerCommandSource source, ServerPlayerEntity targetPlayer, String roleName) throws CommandSyntaxException {
-        for (Role role : WatheRoles.ROLES) {
-            if (role.identifier().getPath().equals(roleName)) {
-                Harpymodloader.addToForcedRoles(role,targetPlayer);
-                source.sendFeedback(() -> Text.translatable("commands.forcerole.success", Text.literal(roleName).withColor(role.color()), targetPlayer.getDisplayName()), true);
+        for (Modifier modifier : HMLModifiers.MODIFIERS) {
+            if (modifier.identifier().getPath().equals(roleName)) {
+                Harpymodloader.addToForcedModifiers(modifier,targetPlayer);
+                source.sendFeedback(() -> Text.translatable("commands.forcerole.success", Text.literal(roleName).withColor(modifier.color()), targetPlayer.getDisplayName()), true);
                 return 1;
             }
         }

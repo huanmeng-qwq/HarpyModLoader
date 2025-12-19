@@ -9,19 +9,19 @@ import dev.doctor4t.wathe.api.Role;
 import dev.doctor4t.wathe.api.WatheRoles;
 import net.minecraft.command.CommandSource;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.util.Identifier;
 import org.agmas.harpymodloader.Harpymodloader;
+import org.agmas.harpymodloader.modifiers.HMLModifiers;
+import org.agmas.harpymodloader.modifiers.Modifier;
 
 import java.util.concurrent.CompletableFuture;
 
-public class RoleSuggestionProvider implements SuggestionProvider<ServerCommandSource> {
+public class ModifierSuggestionProvider implements SuggestionProvider<ServerCommandSource> {
     @Override
     public CompletableFuture<Suggestions> getSuggestions(CommandContext<ServerCommandSource> context, SuggestionsBuilder builder) throws CommandSyntaxException {
         // suggest all roles
-        if (WatheRoles.ROLES.isEmpty()) return Suggestions.empty();
+        if (HMLModifiers.MODIFIERS.isEmpty()) return Suggestions.empty();
 
-        for (Role role : WatheRoles.ROLES) {
-            if (Harpymodloader.VANNILA_ROLES.contains(role)) continue;
+        for (Modifier role : HMLModifiers.MODIFIERS) {
             if (role != null && CommandSource.shouldSuggest(builder.getRemaining(), role.identifier().getPath())) {
                 builder.suggest(role.identifier().getPath());
             }
