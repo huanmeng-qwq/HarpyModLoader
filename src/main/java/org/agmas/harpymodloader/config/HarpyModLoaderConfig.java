@@ -28,4 +28,7 @@ public class HarpyModLoaderConfig {
     @SerialEntry(comment = "Maximum amount of modifiers a player can have.")
     public int modifierMaximum = 1;
 
+    @SerialEntry(comment = "How many modifiers should be given relative to the Killer Dividend")
+    public int modifierMultiplier = 1;
+
 }

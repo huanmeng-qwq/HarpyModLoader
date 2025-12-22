@@ -39,9 +39,18 @@ public class ModdedMurderGameMode extends MurderGameMode {
     }
 
     @Override
+    public void finalizeGame(ServerWorld serverWorld, GameWorldComponent gameWorldComponent) {
+        WorldModifierComponent worldModifierComponent = WorldModifierComponent.KEY.get(serverWorld);
+        worldModifierComponent.getModifiers().clear();
+        super.finalizeGame(serverWorld, gameWorldComponent);
+    }
+
+    @Override
     public void initializeGame(ServerWorld serverWorld, GameWorldComponent gameWorldComponent, List<ServerPlayerEntity> players) {
 
         Harpymodloader.refreshRoles();
+
+        HarpyModLoaderConfig.HANDLER.load();
 
 
         ((TrainWorldComponent)TrainWorldComponent.KEY.get(serverWorld)).setTimeOfDay(TrainWorldComponent.TimeOfDay.NIGHT);
@@ -57,7 +66,8 @@ public class ModdedMurderGameMode extends MurderGameMode {
 
         assignKillerReplacingRoles(roleCount,serverWorld,gameWorldComponent,players);
 
-        assignModifiers(roleCount, serverWorld,gameWorldComponent,players);
+        int modifierRoleCount = roleCount * HarpyModLoaderConfig.HANDLER.instance().modifierMultiplier;
+        assignModifiers(modifierRoleCount, serverWorld,gameWorldComponent,players);
 
         for(ServerPlayerEntity player : players) {
             if (Harpymodloader.VANNILA_ROLES.contains(gameWorldComponent.getRole(player))) {
@@ -138,7 +148,7 @@ public class ModdedMurderGameMode extends MurderGameMode {
             if (!worldModifierComponent.getModifiers(player).isEmpty()) {
                 MutableText modifiersText = Text.translatable("announcement.modifier").formatted(Formatting.GRAY);
                 for (Modifier modifier : worldModifierComponent.getModifiers(player)) {
-                    modifiersText = modifiersText.append(Text.translatable("announcement.modifier." + modifier.identifier().getPath()).withColor(modifier.color()));
+                    modifiersText = modifiersText.append(Text.literal(" ")) .append(Text.translatable("announcement.modifier." + modifier.identifier().getPath()).withColor(modifier.color()));
                 }
                 player.sendMessage(modifiersText, true);
             } else {
@@ -148,6 +158,7 @@ public class ModdedMurderGameMode extends MurderGameMode {
             }
         }
     }
+
     public void assignCivilianReplacingRoles(int desiredRoleCount, ServerWorld serverWorld, GameWorldComponent gameWorldComponent, List<ServerPlayerEntity> players) {
 
         // shuffle roles so modded roles are different every time

@@ -30,4 +30,11 @@ public class ModifierAndRoleResetMixin {
         }
         ResetPlayerEvent.EVENT.invoker().resetPlayer(player);
     }
+
+    @Inject(method = "initializeGame", at = @At("HEAD"))
+    private static void b(ServerWorld serverWorld, CallbackInfo ci) {
+        for (ServerPlayerEntity player : serverWorld.getPlayers()) {
+            ResetPlayerEvent.EVENT.invoker().resetPlayer(player);
+        }
+    }
 }
