@@ -1,6 +1,7 @@
 package org.agmas.harpymodloader.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.context.CommandContext;
 import dev.doctor4t.wathe.api.Role;
 import dev.doctor4t.wathe.api.WatheRoles;
 import net.minecraft.server.command.CommandManager;
@@ -15,10 +16,13 @@ import org.agmas.harpymodloader.modifiers.Modifier;
 
 public class ListRolesCommand {
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
-        dispatcher.register(CommandManager.literal("listRoles").executes((context -> execute(context.getSource()))));
+        dispatcher.register(
+                CommandManager.literal("listRoles")
+                        .executes((ListRolesCommand::execute))
+        );
     }
 
-    private static int execute(ServerCommandSource source) {
+    private static int execute(CommandContext<ServerCommandSource> context) {
         HarpyModLoaderConfig.HANDLER.save();
         MutableText message = Text.literal("Roles:");
         Text enabled = Text.literal("[Enabled] ").withColor(Colors.GREEN);
@@ -40,7 +44,7 @@ public class ListRolesCommand {
             else message.append(enabled);
             message.append(Text.literal(roleId).withColor(modifier.color()).append(" ").append(modifierName));
         }
-        source.sendMessage(message);
+        context.getSource().sendMessage(message);
         return 1;
     }
 }

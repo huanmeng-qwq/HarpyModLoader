@@ -26,7 +26,7 @@ public class ForceRoleCommand {
         ServerPlayerEntity targetPlayer = EntityArgumentType.getPlayer(context, "player");
         if (!Harpymodloader.FORCED_MODDED_ROLE_FLIP.containsKey(targetPlayer.getUuid())) {
             context.getSource().sendFeedback(() -> Text.translatable("commands.forcerole.query.none", targetPlayer.getDisplayName()), false);
-            return 1;
+            return 0;
         }
         Role role = Harpymodloader.FORCED_MODDED_ROLE_FLIP.get(targetPlayer.getUuid());
         Text roleText = Harpymodloader.getRoleName(role).withColor(role.color());

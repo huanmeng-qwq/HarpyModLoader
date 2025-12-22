@@ -17,7 +17,14 @@ public class SetEnabledModifierCommand {
 
 
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
-        dispatcher.register(CommandManager.literal("setEnabledModifier").requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(2)).then(CommandManager.argument("modifier", ModifierArgumentType.create()).then(CommandManager.argument("enabled", BoolArgumentType.bool()).executes(SetEnabledModifierCommand::execute))));
+        dispatcher.register(
+                CommandManager.literal("setEnabledModifier")
+                        .requires(serverCommandSource -> serverCommandSource.hasPermissionLevel(2))
+                        .then(CommandManager.argument("modifier", ModifierArgumentType.create())
+                                .then(CommandManager.argument("enabled", BoolArgumentType.bool())
+                                        .executes(SetEnabledModifierCommand::execute))
+                        )
+        );
     }
 
     private static int execute(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
