@@ -10,7 +10,7 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import org.agmas.harpymodloader.Harpymodloader;
-import org.agmas.harpymodloader.commands.suggestions.RoleArgumentType;
+import org.agmas.harpymodloader.commands.argument.RoleArgumentType;
 
 public class ForceRoleCommand {
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {

@@ -9,7 +9,7 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import org.agmas.harpymodloader.Harpymodloader;
-import org.agmas.harpymodloader.commands.suggestions.ModifierArgumentType;
+import org.agmas.harpymodloader.commands.argument.ModifierArgumentType;
 import org.agmas.harpymodloader.modifiers.Modifier;
 
 public class ForceModifierCommand {

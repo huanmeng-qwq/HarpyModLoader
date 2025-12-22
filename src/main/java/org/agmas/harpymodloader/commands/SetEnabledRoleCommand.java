@@ -10,7 +10,7 @@ import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 import org.agmas.harpymodloader.Harpymodloader;
-import org.agmas.harpymodloader.commands.suggestions.RoleArgumentType;
+import org.agmas.harpymodloader.commands.argument.RoleArgumentType;
 import org.agmas.harpymodloader.config.HarpyModLoaderConfig;
 
 public class SetEnabledRoleCommand {

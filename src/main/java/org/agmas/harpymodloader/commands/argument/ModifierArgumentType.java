@@ -1,4 +1,4 @@
-package org.agmas.harpymodloader.commands.suggestions;
+package org.agmas.harpymodloader.commands.argument;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;

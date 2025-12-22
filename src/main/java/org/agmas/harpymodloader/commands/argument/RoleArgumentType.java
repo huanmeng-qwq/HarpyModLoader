@@ -1,4 +1,4 @@
-package org.agmas.harpymodloader.commands.suggestions;
+package org.agmas.harpymodloader.commands.argument;
 
 import com.google.gson.JsonObject;
 import com.mojang.brigadier.StringReader;

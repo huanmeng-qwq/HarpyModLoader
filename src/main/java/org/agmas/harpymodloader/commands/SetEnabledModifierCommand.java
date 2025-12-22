@@ -8,7 +8,7 @@ import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
-import org.agmas.harpymodloader.commands.suggestions.ModifierArgumentType;
+import org.agmas.harpymodloader.commands.argument.ModifierArgumentType;
 import org.agmas.harpymodloader.config.HarpyModLoaderConfig;
 import org.agmas.harpymodloader.modifiers.Modifier;
 
