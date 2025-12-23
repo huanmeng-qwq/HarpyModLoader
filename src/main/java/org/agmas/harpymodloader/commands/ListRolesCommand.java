@@ -26,14 +26,14 @@ public class ListRolesCommand {
         message.append(Text.translatable("commands.listroles.role.title")).append("\n");
         message.append(Texts.join(WatheRoles.ROLES, Text.literal("\n"), role -> {
             final boolean disabled = HarpyModLoaderConfig.HANDLER.instance().disabled.contains(role.identifier().toString());
-            final MutableText status = createStatus(disabled, "/setEnabledRole " + role.identifier() + " " + disabled);
+            final MutableText status = createStatus(context.getSource(), disabled, "/setEnabledRole " + role.identifier() + " " + disabled);
             return buildElementText(Harpymodloader.getRoleName(role).withColor(role.color()), role.identifier(), status);
         }));
         message.append("\n\n");
         message.append(Text.translatable("commands.listroles.modifier.title")).append("\n");
         message.append(Texts.join(HMLModifiers.MODIFIERS, Text.literal("\n"), modifier -> {
             final boolean disabled = HarpyModLoaderConfig.HANDLER.instance().disabledModifiers.contains(modifier.identifier().toString());
-            final MutableText status = createStatus(disabled, "/setEnabledModifier " + modifier.identifier() + " " + disabled);
+            final MutableText status = createStatus(context.getSource(), disabled, "/setEnabledModifier " + modifier.identifier() + " " + disabled);
             return buildElementText(modifier.getName(true), modifier.identifier(), status);
         }));
 
@@ -45,8 +45,14 @@ public class ListRolesCommand {
         return Text.empty().append(name.copy()).append(" ").append(Text.literal("(" + identifier + ")")).append(" ").append(status);
     }
 
-    private static MutableText createStatus(boolean disabled, String cmd) {
+    private static MutableText createStatus(ServerCommandSource source, boolean disabled, String cmd) {
         String key = disabled ? "disabled" : "enabled";
-        return Text.translatable("commands.listroles.status." + key + ".text").styled(style-> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.translatable("commands.listroles.status." + key + ".hover", cmd))).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, cmd)));
+        return Text.translatable("commands.listroles.status." + key + ".text").styled(style -> {
+            if (source.hasPermissionLevel(2)) {
+                return style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.translatable("commands.listroles.status." + key + ".hover", cmd))).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, cmd));
+            } else {
+                return style;
+            }
+        });
     }
 }

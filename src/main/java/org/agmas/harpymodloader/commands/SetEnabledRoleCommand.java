@@ -15,7 +15,6 @@ import org.agmas.harpymodloader.commands.argument.RoleArgumentType;
 import org.agmas.harpymodloader.config.HarpyModLoaderConfig;
 
 public class SetEnabledRoleCommand {
-    public static final SimpleCommandExceptionType INVALID_ROLE_EXCEPTION = new SimpleCommandExceptionType(Text.translatable("commands.setenabledrole.invalid"));
     public static final SimpleCommandExceptionType ROLE_UNCHANGED_EXCEPTION = new SimpleCommandExceptionType(Text.translatable("commands.setenabledrole.unchanged"));
 
 
