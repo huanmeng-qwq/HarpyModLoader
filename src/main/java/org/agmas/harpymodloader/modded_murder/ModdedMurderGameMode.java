@@ -33,6 +33,7 @@ import org.agmas.harpymodloader.events.ModdedRoleAssigned;
 import org.agmas.harpymodloader.events.ModifierAssigned;
 import org.agmas.harpymodloader.events.ResetPlayerEvent;
 import org.agmas.harpymodloader.modifiers.HMLModifiers;
+import org.agmas.harpymodloader.modifiers.Modifier;
 import org.jetbrains.annotations.NotNull;
 
 public class ModdedMurderGameMode extends MurderGameMode {
@@ -90,8 +91,15 @@ public class ModdedMurderGameMode extends MurderGameMode {
     public void assignModifiers(int desiredRoleCount, ServerWorld serverWorld, GameWorldComponent gameWorldComponent, List<ServerPlayerEntity> players) {
         WorldModifierComponent worldModifierComponent = WorldModifierComponent.KEY.get(serverWorld);
         worldModifierComponent.getModifiers().clear();
+        int killerMods = (int) HMLModifiers.MODIFIERS.stream().filter(modifier -> modifier.killerOnly).count();
         HMLModifiers.MODIFIERS.forEach((mod)->{
             int playersAssigned = 0;
+            int specificDesiredRoleCount = desiredRoleCount;
+
+            if (mod.killerOnly) {
+                specificDesiredRoleCount = (int) Math.floor(Math.floor((double) players.size() / gameWorldComponent.getKillerDividend()) / killerMods);
+                specificDesiredRoleCount = Math.max(specificDesiredRoleCount, 1);
+            }
 
             ArrayList<ServerPlayerEntity> shuffledPlayers = new ArrayList<>(players);
             Collections.shuffle(shuffledPlayers);
@@ -109,7 +117,7 @@ public class ModdedMurderGameMode extends MurderGameMode {
 
             for (ServerPlayerEntity player : shuffledPlayers) {
                 if (HarpyModLoaderConfig.HANDLER.instance().disabledModifiers.contains(mod.identifier.toString())) continue;
-                if (playersAssigned >= desiredRoleCount) continue;
+                if (playersAssigned >= specificDesiredRoleCount) continue;
 
                 if (Harpymodloader.MODIFIER_MAX.containsKey(mod.identifier))
                     if (playersAssigned >= Harpymodloader.MODIFIER_MAX.get(mod.identifier)) continue;
